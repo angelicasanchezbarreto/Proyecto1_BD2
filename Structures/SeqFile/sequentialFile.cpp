@@ -104,9 +104,24 @@ void SequentialFile::reconstruction(){
     remove("aux.dat");
 }
 
-SequentialFile::SequentialFile(string filename){
-    this->filename = filename;
+void SequentialFile::openFile(){
+    ifstream dataIn;
+    ofstream file;
+    checkOpening(inFile,inAuxFile);
+    Record record;   
+    record.find(inFile,inAuxFile,key); 
+    inFile.close();  
+    inAuxFile.close();  
+    return record;
+}
+
+
+//PUBLIC
+
+SequentialFile::SequentialFile(){
+    this->filename = "data.dat";
     this->auxFilename = "aux.dat";
+    this->dataFilename = "bodegas.txt";
 }
 
 void SequentialFile::insertAll(vector<Record> records){

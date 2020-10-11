@@ -8,6 +8,26 @@ void Record::print(){
     " " << ventas1 << " " << ventas2 << " " << ventas3 << " " << ventas4;
 }
 
+
+Record::Record(string record){
+    stringstream delimeter(record);
+    string word;
+    int cont=0;
+    while(getline(delimeter,word,',')){
+        switch (cont){
+        case 0: strcpy(this->bodega,word.c_str()); cont++; break;
+        case 1: strcpy(this->distrito,word.c_str()); cont++; break;
+        case 2: this->aforo = stoi(word); cont++; break;
+        case 3: this->productos = stoi(word); cont++; break;
+        case 4: this->ventas1 = stof(word); cont++; break;
+        case 5: this->ventas2 = stof(word); cont++; break;
+        case 6: this->ventas3 = stof(word); cont++; break;
+        case 7: this->ventas4 = stof(word); cont++; break;
+        default: break;
+        }
+    }
+}
+
 Record Record::padding(){
     for (int i = 0; i < 30; i++){
         if (bodega[i] == '\0')

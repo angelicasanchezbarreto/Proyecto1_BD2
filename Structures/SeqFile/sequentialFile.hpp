@@ -10,6 +10,9 @@ class SequentialFile{
     private:
         string filename;
         string auxFilename;
+        string dataFilename;
+
+        void openFile();
 
         void writeRecord(Record record,string filename);
         
@@ -23,7 +26,7 @@ class SequentialFile{
 
     public:
     
-        SequentialFile(string filename);
+        SequentialFile();
 
         void insertAll(vector<Record> records);
 
@@ -39,4 +42,6 @@ class SequentialFile{
             remove("datos1.dat");
             remove("aux.dat");
         } */
+
+
 };

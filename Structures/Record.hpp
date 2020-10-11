@@ -10,14 +10,18 @@ class Record{
         char distrito[30]; 
         int aforo;
         int productos;
-        int ventas1;
-        int ventas2;
-        int ventas3;
-        int ventas4;
+        float ventas1;
+        float ventas2;
+        float ventas3;
+        float ventas4;
         bool inAux=false;
         int pointerTo;
 
         void print();
+
+        Record();
+        
+        Record(string record);
 
         Record padding();
 
