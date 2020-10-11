@@ -230,6 +230,14 @@ class SequentialFile{
             inAuxFile.close();
         }
 
+        bool remove(int pos){
+            fstream inFile;
+            fstream inAuxFile;
+            inFile.open(filename, ios::binary|ios::in|ios::out);
+            inAuxFile.open(auxFilename, ios::binary|ios::in|ios::out);
+            
+        }
+
         /* ~SequentialFile(){
             remove("datos1.dat");
             remove("aux.dat");
