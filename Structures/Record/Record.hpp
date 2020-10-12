@@ -41,5 +41,5 @@ class Record{
 
         void setNewValues(Record &other, int pointerTo, bool whichFile);
 
-        void find(ifstream &inFile, ifstream &inAuxFile, string key);
+        void find(ifstream &inFile, ifstream &inAuxFile, string key, pair<int,bool> header);
 };

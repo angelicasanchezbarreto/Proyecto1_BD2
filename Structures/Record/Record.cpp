@@ -103,8 +103,15 @@ void Record::setNewValues(Record &other, int pointerTo, bool whichFile){
     this->setWhichFile(whichFile);
 }
 
-void Record::find(ifstream &inFile, ifstream &inAuxFile, string key){
-    inFile.read((char *) this, sizeof(Record));
+void Record::find(ifstream &inFile, ifstream &inAuxFile, string key, pair<int,bool> header){
+    if(!header.second){
+        inFile.seekg(header.first*sizeof(Record));
+        inFile.read((char *) this, sizeof(Record));
+    } else{
+        inAuxFile.seekg(header.first*sizeof(Record));
+        inAuxFile.read((char *) this, sizeof(Record));
+    }
+    //inFile.read((char *) this, sizeof(Record));
     while (!(this->compareKey(key))) { 
         if(!this->inAux){
             inFile.seekg(this->pointerTo*sizeof(Record));

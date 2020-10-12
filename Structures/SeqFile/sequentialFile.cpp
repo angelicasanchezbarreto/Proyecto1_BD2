@@ -7,9 +7,9 @@
 #include <iomanip> 
 
 bool compare(const Record& record1, const Record& record2){
-    //string s1(record1.bodega),s2(record2.bodega);
-    //return (s1 < s2);
-    return record1.bodega<record2.bodega;
+    string s1(record1.bodega),s2(record2.bodega);
+    return (s1 < s2);
+    //return record1.bodega<record2.bodega;
 }
 
 void SequentialFile::writeRecord(Record record,string filename){        
@@ -42,6 +42,7 @@ int SequentialFile::numberOfRecords(string whichFile){
 }
 
 void SequentialFile::update(Record record){
+    int cont = this->numOfRecords;
     fstream file;
     fstream auxfile;
     file.open(filename,ios::ate|ios::in|ios::out|ios::binary);
@@ -49,25 +50,38 @@ void SequentialFile::update(Record record){
 
     Record nextRecord;   
     Record prevRecord; 
-    file.seekg(0); 
-    file.read((char *) &nextRecord, sizeof(nextRecord));
+    //file.seekg(0); 
+    //file.read((char *) &nextRecord, sizeof(nextRecord));
+    if(!header.second){
+        file.seekg(header.first*sizeof(Record));
+        file.read((char *) &nextRecord, sizeof(Record));
+    } else{
+        auxfile.seekg(header.first*sizeof(Record));
+        auxfile.read((char *) &nextRecord, sizeof(Record));
+    }
     prevRecord = nextRecord;
-    while (!file.eof()) {
+    //while (!file.eof()) {
+    bool changed=false;
+    while (changed==false) {
         if(!prevRecord.inAux){
             if (record.checkIfKeyEqual(nextRecord)){
                 file.seekp(file.tellg() - streamoff(sizeof(Record)));
                 file.write((char *)&record, sizeof(Record));
+                changed=true;
                 break;
             }
             prevRecord = nextRecord;
+            file.seekg(nextRecord.pointerTo*sizeof(Record));
             file.read((char *)&nextRecord, sizeof(Record));
         } else {
             if (record.checkIfKeyEqual(nextRecord)){
-                auxfile.seekp(file.tellg() - streamoff(sizeof(Record)));
+                auxfile.seekp(auxfile.tellg() - streamoff(sizeof(Record)));
                 auxfile.write((char *)&record, sizeof(Record));
+                changed=true;
                 break;
             }
             prevRecord = nextRecord;
+            auxfile.seekg(nextRecord.pointerTo*sizeof(Record));
             auxfile.read((char *)&nextRecord, sizeof(Record));
         }
     }
@@ -75,6 +89,7 @@ void SequentialFile::update(Record record){
 } 
 
 void SequentialFile::reconstruction(){
+    int cont = this->numOfRecords;
     ifstream inFile;
     ifstream inAuxFile;        
     checkOpening(inFile,inAuxFile);
@@ -83,10 +98,21 @@ void SequentialFile::reconstruction(){
     Record record;
     Record toInsert;
     int pos=1;
-    inFile.read((char *) &record, sizeof(record));
+
+    if(!header.second){
+        inFile.seekg(header.first*sizeof(Record));
+        inFile.read((char *) &record, sizeof(Record));
+    } else{
+        inAuxFile.seekg(header.first*sizeof(Record));
+        inAuxFile.read((char *) &record, sizeof(Record));
+    }
+
+    this->header={0,false};
+    //inFile.read((char *) &record, sizeof(record));
     toInsert.setNewValues(record,pos,false);
     newFile.write((char *) &toInsert, sizeof(record)); 
-    while(!inFile.eof()){
+    //while(!inFile.eof()){
+    while(cont--){
         pos++;
         if(!record.inAux){
             inFile.seekg(record.pointerTo*sizeof(Record));
@@ -100,8 +126,12 @@ void SequentialFile::reconstruction(){
             newFile.write((char *) &toInsert, sizeof(record)); 
         }
     }
-    this->filename = "newFile.dat";
+    //this->filename = "newFile.dat";
+    inFile.clear();
+    inAuxFile.clear();
+    remove("data.dat");
     remove("aux.dat");
+    rename("newFile.dat","data.dat");
 }
 
 void SequentialFile::openFile(){
@@ -115,8 +145,9 @@ void SequentialFile::openFile(){
         exit(EXIT_FAILURE);
 
     string line;
-    while(!dataIn.eof()){
-        getline(dataIn,line);
+    //while(!dataIn.eof()){
+    while(getline(dataIn,line)){
+        //getline(dataIn,line);
         Record record(line);
         //mainOut.write((char*)&record, sizeof(Record));
         //initData(record);
@@ -175,7 +206,7 @@ void SequentialFile::initData(Record record){
 SequentialFile::SequentialFile(){
     this->filename = "data.dat";
     this->auxFilename = "aux.dat";
-    this->dataFilename = "bodegas.txt";
+    this->dataFilename = "bodegas2.txt";
     openFile();
 }
 
@@ -184,35 +215,10 @@ Record SequentialFile::search(string key){
     ifstream inAuxFile;        
     checkOpening(inFile,inAuxFile);
     Record record;   
-    record.find(inFile,inAuxFile,key); 
+    record.find(inFile,inAuxFile,key,this->header); 
     inFile.close();  
     inAuxFile.close();  
     return record;
-}
-
-vector<Record> SequentialFile::search(string begin, string end){
-    vector<Record> records;
-    ifstream inFile;
-    ifstream inAuxFile;        
-    checkOpening(inFile,inAuxFile); 
-
-    Record record;   
-    record.find(inFile,inAuxFile,begin); 
-    records.push_back(record);
-
-    while (!(record.compareKey(end))) { 
-        if(!record.inAux){
-            inFile.seekg(record.pointerTo*sizeof(Record));
-            inFile.read((char *) &record, sizeof(record));    
-        } else {
-            inAuxFile.seekg(record.pointerTo*sizeof(Record));
-            inAuxFile.read((char *) &record, sizeof(record));
-        }
-        records.push_back(record);
-    }
-    inFile.close();  
-    inAuxFile.close();  
-    return records;
 }
 
 void SequentialFile::scanAll(){
@@ -243,6 +249,7 @@ void SequentialFile::scanAll(){
 }
 
 void SequentialFile::add(Record record){
+    int cont = this->numOfRecords;
     fstream inFile;
     fstream inAuxFile;
     inFile.open(filename, ios::binary|ios::in|ios::out);  
@@ -251,22 +258,27 @@ void SequentialFile::add(Record record){
     inAuxFile.open(auxFilename, ios::binary|ios::in|ios::out);  
 
     if(numberOfRecords(filename)==0){
-        record.setPointer(1);
+        record.setPointer(-1);
         inFile.write((char*)&record, sizeof(Record));
         this->header={0,false};
     }
     else if(numberOfRecords(auxFilename)<5){
         Record nextRecord;   
         Record prevRecord; 
-        if(!header.second)
+        if(!header.second){
+            inFile.seekg(header.first*sizeof(Record));
             inFile.read((char *) &nextRecord, sizeof(Record));
-        else
+        } else{
+            inAuxFile.seekg(header.first*sizeof(Record));
             inAuxFile.read((char *) &nextRecord, sizeof(Record));
+        }
 
         prevRecord = nextRecord;
-        while (!inFile.eof()) {
+        while (cont--) {
             if(compare(nextRecord,record)) {
                 prevRecord = nextRecord;
+                if(nextRecord.pointerTo==-1)
+                    break;
                 if(!nextRecord.inAux){
                     inFile.seekg(nextRecord.pointerTo*sizeof(Record));
                     inFile.read((char *) &nextRecord, sizeof(Record));    
@@ -278,19 +290,32 @@ void SequentialFile::add(Record record){
             else break;
         }
         if(prevRecord==nextRecord){
-            record.setPointer(this->header.first);
-            record.setWhichFile(this->header.second);
-            this->header.first = numberOfRecords(auxFilename)-1;
-            this->header.second=true;
-            writeRecord(record,auxFilename);
+            if(!compare(prevRecord,record)){
+                record.setPointer(this->header.first);
+                record.setWhichFile(this->header.second);
+                this->header.first = numberOfRecords(auxFilename);
+                this->header.second=true;
+                prevRecord.setPointer(this->header.first);
+                prevRecord.setWhichFile(this->header.second);
+                writeRecord(record,auxFilename);
+                //update(prevRecord);
+            } else {
+                //record.setPointer(numberOfRecords(auxFilename)+1);
+                record.setPointer(prevRecord.pointerTo);
+                record.setWhichFile(true);
+                prevRecord.setPointer(numberOfRecords(auxFilename));
+                prevRecord.setWhichFile(true);
+                writeRecord(record,auxFilename);
+                update(prevRecord);
+            }
             //this->header.first = inAuxFile.tellg(); //check later
             
         } else{
             record.setPointer(prevRecord.pointerTo);
             record.setWhichFile(prevRecord.inAux);
-            writeRecord(record,auxFilename);
             prevRecord.setWhichFile(true); //true if is at the aux file
             prevRecord.setPointer(numberOfRecords(auxFilename));
+            writeRecord(record,auxFilename);
             update(prevRecord);                
         }
     }
@@ -298,6 +323,8 @@ void SequentialFile::add(Record record){
     if(numberOfRecords(auxFilename)==5){
         reconstruction();
     }
+
+    this->numOfRecords++;
 
     inFile.close();
     inAuxFile.close();
