@@ -3,23 +3,11 @@
 void Menu::displayMenu(){
     cout << "WELCOME TO B0DEGA-LAND\n";
     cout << "Select the structure you want to work with: \n";
-    cout << "1. Extendible Hashing\n";
-    cout << "2. Sequential File\n";
+    cout << "1 Extendible Hashing\n";
+    cout << "2 Sequential File\n";
     cout << "Insert the corresponding number: \n";
     cin >> structureNum;
-    setStructure(structureNum);
     displayOperationsMenu();
-}
-
-void Menu::setStructure(int structure){
-    switch (structure){
-    case 1:
-        break;
-    case 2:
-        break;
-    default:
-        break;
-    }
 }
 
 void Menu::displayOperationsMenu(){
@@ -29,16 +17,56 @@ void Menu::displayOperationsMenu(){
     cout << "3. Delete\n";
     cout << "Insert the corresponding number: \n";
     cin >> operation;
-    cout << "Insert the name of the record you want to " << getOperation() << endl;
+    switch (operation)
+    {
+    case 1:
+        Insertion();
+        break;
+    case 2:
+        Search();
+        break;
+    case 3:
+        Remove();
+        break;
+    default:
+        break;
+    }
+    //cout << "Insert the name of the record you want to " << getOperation() << endl;
 }
 
-string Menu::getOperation(){
-    string result;
-    switch (operation){
-    case 1: result = "insert"; break;
-    case 2: result = "search"; break;
-    case 3: result = "delete"; break;
-    default: break;
-    }
-    return result;
+void Menu::Insertion(){
+    Record reg;
+    cout << "Write the data to insert\n";
+    cin >> reg.bodega >> reg.distrito >> reg.aforo >> reg.productos >> reg.ventas1 >> reg.ventas2 >> reg.ventas3 >> reg.ventas4;
+    if(structureNum == 1)
+        structure.add(reg);
+    /*
+    else
+        hashing.add(reg);
+        */
 }
+
+void Menu::Remove(){
+    int pos;
+    cout << "Write the position to eliminate\n";
+    cin >> pos;
+    /*
+    if(structureNum == 1)
+        structure.remove(pos);
+    else
+        hashing.remove(pos);
+        */
+}
+
+void Menu::Search(){
+    string key;
+    cout << "Write the bodega to search\n";
+    cin >> key;
+    if(structureNum == 1)
+        structure.search(key);
+    /*
+    else
+        hashing.search(key);
+    */
+}
+

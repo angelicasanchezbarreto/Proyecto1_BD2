@@ -253,7 +253,7 @@ void SequentialFile::add(Record record){
     if(numberOfRecords(filename)==0){
         record.setPointer(1);
         inFile.write((char*)&record, sizeof(Record));
-        this->header={0,false};
+        this->header = make_pair(0,false);
     }
     else if(numberOfRecords(auxFilename)<5){
         Record nextRecord;   
