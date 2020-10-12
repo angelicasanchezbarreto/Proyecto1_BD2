@@ -18,6 +18,7 @@ class SequentialFile{
         string indexFilename;
         pair<int,bool> header;
         vector<Record> records;
+        int numOfRecords=0;
 
         void openFile();
 
@@ -39,16 +40,14 @@ class SequentialFile{
 
         Record search(string key);
 
-        vector<Record> search(string begin, string end);
-
         void scanAll();
 
         void add(Record record);
 
-        /* ~SequentialFile(){
-            remove("datos1.dat");
+        ~SequentialFile(){
+            remove("data.dat");
             remove("aux.dat");
-        } */
+        }
 
 
 };

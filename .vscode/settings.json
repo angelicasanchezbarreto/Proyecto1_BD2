@@ -10,6 +10,7 @@
         "vector": "cpp",
         "array": "cpp",
         "*.tcc": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "new": "cpp"
     }
 }
