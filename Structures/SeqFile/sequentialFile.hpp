@@ -1,16 +1,23 @@
-#include "Record.cpp"
+#pragma once
+
+#include "../Record/Record.cpp"
 #include <string>
 #include <vector>
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <stdio.h>
 #include <iomanip> 
+
 
 class SequentialFile{
     private:
         string filename;
         string auxFilename;
         string dataFilename;
+        string indexFilename;
+        pair<int,bool> header;
+        vector<Record> records;
 
         void openFile();
 
@@ -24,11 +31,11 @@ class SequentialFile{
 
         void reconstruction();
 
+        void initData(Record record);
+
     public:
     
         SequentialFile();
-
-        void insertAll(vector<Record> records);
 
         Record search(string key);
 

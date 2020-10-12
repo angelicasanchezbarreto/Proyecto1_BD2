@@ -5,7 +5,8 @@ void Record::print(){
     if(this->inAux) inAux = "AUX";
     else inAux = "MAIN";
     cout << bodega << " " << distrito << " " << aforo << " " << productos << 
-    " " << ventas1 << " " << ventas2 << " " << ventas3 << " " << ventas4;
+    " " << ventas1 << " " << ventas2 << " " << ventas3 << " " << ventas4 << 
+    " " << pointerTo << " " << inAux ;
 }
 
 
@@ -15,8 +16,16 @@ Record::Record(string record){
     int cont=0;
     while(getline(delimeter,word,',')){
         switch (cont){
-        case 0: strcpy(this->bodega,word.c_str()); cont++; break;
-        case 1: strcpy(this->distrito,word.c_str()); cont++; break;
+        case 0: 
+            strcpy(this->bodega,word.c_str()); 
+            padding(word.length(),this->bodega);
+            cont++; break;
+        //case 0: this->bodega = word; cont++; break;
+        case 1: 
+            strcpy(this->distrito,word.c_str()); 
+            padding(word.length(),this->distrito);
+            cont++; break;
+        //case 1: this->distrito = word; cont++; break;
         case 2: this->aforo = stoi(word); cont++; break;
         case 3: this->productos = stoi(word); cont++; break;
         case 4: this->ventas1 = stof(word); cont++; break;
@@ -28,17 +37,12 @@ Record::Record(string record){
     }
 }
 
-Record Record::padding(){
-    for (int i = 0; i < 30; i++){
-        if (bodega[i] == '\0')
-            bodega[i] = ' ';
-    }
-    for (int i = 0; i < 30; i++){
-        if (distrito[i] == '\0')
-            distrito[i] = ' ';
-    }
-    return *this;
+void Record::padding(int size, char* variable){
+    for(int i=size; i<39; i++)
+        variable[i] = ' ';
+    //variable[39]='\0';
 }
+
 
 void Record::setPointer(int num){
     this->pointerTo = num;
@@ -51,6 +55,8 @@ void Record::setWhichFile(bool isOnAux){
 Record Record::operator=(const Record &other) {
     strcpy(bodega,other.bodega);
     strcpy(distrito,other.distrito);
+    /* this->bodega=other.bodega;
+    this->distrito=other.distrito; */
     this->aforo=other.aforo;
     this->productos=other.productos;
     this->ventas1=other.ventas1;

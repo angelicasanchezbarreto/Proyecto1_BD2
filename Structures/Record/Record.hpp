@@ -1,13 +1,15 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <string>
+#include <sstream>
 
 using namespace std;
 
 class Record{
     public:
-        char bodega[30]; //key
-        char distrito[30]; 
+        char bodega[40]; //key
+        char distrito[40]; 
         int aforo;
         int productos;
         float ventas1;
@@ -19,11 +21,11 @@ class Record{
 
         void print();
 
-        Record();
+        Record(){}
         
         Record(string record);
 
-        Record padding();
+        void padding(int size, char* variable);
 
         void setPointer(int num);
 

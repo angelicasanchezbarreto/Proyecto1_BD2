@@ -9,6 +9,7 @@
         "string": "cpp",
         "vector": "cpp",
         "array": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "fstream": "cpp"
     }
 }
