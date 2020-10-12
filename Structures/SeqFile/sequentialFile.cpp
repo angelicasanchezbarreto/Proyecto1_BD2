@@ -235,7 +235,10 @@ class SequentialFile{
             fstream inAuxFile;
             inFile.open(filename, ios::binary|ios::in|ios::out);
             inAuxFile.open(auxFilename, ios::binary|ios::in|ios::out);
-            
+
+            while(inFile.eof()){
+                
+            }
         }
 
         /* ~SequentialFile(){
