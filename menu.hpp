@@ -1,17 +1,19 @@
+#pragma once
+
 #include "Structures/SeqFile/sequentialFile.cpp"
 
 struct Menu{
-    void displayMenu();
-    void executeOperation();
+    Menu();
     private:
     int operation;
     int structureNum;
-    SequentialFile structure;
+    SequentialFile structureSeq;
     //Hashing hashingFile;
-    void setStructure(int structure);
-
-    template<typename T>
-    void setOperation(T structure);
-    string getOperation();
+    void displayMenu();
+    void executeOperation(string key);
+    void executeOperation(vector<string> data);
+    void setOperation();
+    string getOperationName();
     void displayOperationsMenu();
+    
 };

@@ -9,6 +9,30 @@ void Record::print(){
     " " << pointerTo << " " << inAux ;
 }
 
+Record::Record(vector<string> data){
+    int cont=0;
+    for(int i=0; i<data.size(); i++){
+        switch (i){
+        case 0: 
+            strcpy(this->bodega,data[i].c_str()); 
+            padding(data[i].length(),this->bodega);
+            cont++; break;
+        //case 0: this->bodega = word; cont++; break;
+        case 1: 
+            strcpy(this->distrito,data[i].c_str()); 
+            padding(data[i].length(),this->distrito);
+            cont++; break;
+        //case 1: this->distrito = word; cont++; break;
+        case 2: this->aforo = stoi(data[i]); cont++; break;
+        case 3: this->productos = stoi(data[i]); cont++; break;
+        case 4: this->ventas1 = stof(data[i]); cont++; break;
+        case 5: this->ventas2 = stof(data[i]); cont++; break;
+        case 6: this->ventas3 = stof(data[i]); cont++; break;
+        case 7: this->ventas4 = stof(data[i]); cont++; break;
+        default: break;
+        }
+    }
+}
 
 Record::Record(string record){
     stringstream delimeter(record);

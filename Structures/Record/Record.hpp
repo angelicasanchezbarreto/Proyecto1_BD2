@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -23,6 +24,8 @@ class Record{
 
         Record(){}
         
+        Record(vector<string> data);
+
         Record(string record);
 
         void padding(int size, char* variable);
