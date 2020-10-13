@@ -6,18 +6,14 @@ Menu::Menu(){
 }
 
 void Menu::displayMenu(){
-    cout << "BIENVENIDO A B0DEGA-LAND\n";
-    cout << "Selecciona la estructura con la que quieres trabajar: \n";
-    cout << "1. Extendible Hashing\n";
-    cout << "2. Sequential File\n";
-    cout << "Inserta el número correspondiente: \n";
+    cout << "WELCOME TO B0DEGA-LAND\n";
+    cout << "Select the structure you want to work with: \n";
+    cout << "1 Extendible Hashing\n";
+    cout << "2 Sequential File\n";
+    cout << "Insert the corresponding number: \n";
     cin >> structureNum;
-    cout << endl;
     displayOperationsMenu();
-    if(this->operation!=5)
-        displayMenu();
 }
-
 
 void Menu::displayOperationsMenu(){
     cout << "Selecciona la operación que quieres realizar: \n";
