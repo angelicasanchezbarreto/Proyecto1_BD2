@@ -1,14 +1,10 @@
-
-//#include "Structures/SeqFile/sequentialFile.cpp"
-#include "menu.hpp"
+#include "menu.cpp"
 
 int main(){
     Menu menu;
-    /*
-    SequentialFile sequentialFile;
-    sequentialFile.scanAll();
-    cout << endl;
->>>>>>> 13e5051e3cab53be1cd47727e97025ca74c16aaf
+    //SequentialFile sequentialFile;
+    //sequentialFile.scanAll();
+    //cout << endl;
     /* Record rec = sequentialFile.search("molinete");
     rec.print();
     cout << endl;

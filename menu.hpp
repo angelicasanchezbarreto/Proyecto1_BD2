@@ -1,6 +1,6 @@
 #pragma once
+
 #include "Structures/SeqFile/sequentialFile.cpp"
-//#include "Structures/Hashing/mainHash.cpp"
 
 struct Menu{
     Menu();
