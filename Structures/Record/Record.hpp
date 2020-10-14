@@ -30,6 +30,8 @@ class Record{
 
         Record operator=(const Record &other);
 
+        bool compareKey(string key);
+
     protected:
 
         void padding(int size, char* variable);
@@ -41,8 +43,6 @@ class Record{
         bool operator==(const Record &other);
 
         bool checkIfKeyEqual(const Record& record2);
-
-        bool compareKey(string key);
 
         void setNewValues(Record &other, int pointerTo, bool whichFile);
 

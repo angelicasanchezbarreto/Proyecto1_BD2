@@ -8,11 +8,10 @@ int main(){
     /* SequentialFile sequentialFile1;
     sequentialFile1.scanAll();
     cout << endl;
-    sequentialFile1.eliminate("estruendosamente desherrumbramiento");
-    sequentialFile1.scanAll();
-    //scan();
+    Record rec = sequentialFile1.search("estruendosamente desherrumbramiento");
+    rec.print(); */
 
-    cout << endl;
+    /* cout << endl;
     Record rec = sequentialFile1.search("acertero");
     rec.print();
     cout << endl; */

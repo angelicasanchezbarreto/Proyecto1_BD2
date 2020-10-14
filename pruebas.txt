@@ -1,0 +1,6 @@
+insertar:
+alhondiguero quincenario,Comas,2,33,3057.59,3351.27,3088.49,2629.33
+antoniniano arquiepiscopal,San Juan de Lurigancho,2,33,1014.22,1065.91,947.49,721.92
+buscar:
+morenito chuparrosa,Ate,2,26,1864.94,2594.67,2150.39,2064.62
+floreciente remoldar,Comas,9,133,3263.08,3302.82,4474.05,3821.42
