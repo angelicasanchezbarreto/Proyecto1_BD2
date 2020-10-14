@@ -1,17 +1,20 @@
 #include "menu.cpp"
+//#include "Structures/SeqFile/sequentialFile.cpp"
+
 
 int main(){
     Menu menu;
-    //SequentialFile sequentialFile;
-    //sequentialFile.scanAll();
-    //cout << endl;
-    /* Record rec = sequentialFile.search("molinete");
+
+    /* SequentialFile sequentialFile1;
+    sequentialFile1.scanAll();
+    cout << endl;
+    sequentialFile1.eliminate("estruendosamente desherrumbramiento");
+    sequentialFile1.scanAll();
+    //scan();
+
+    cout << endl;
+    Record rec = sequentialFile1.search("acertero");
     rec.print();
-    cout << endl;
-    Record rec2 = sequentialFile.search("gratificador");
-    rec2.print();
-    cout << endl;
-    Record rec3 = sequentialFile.search("cableado");
-    rec3.print(); */
+    cout << endl; */
     return 0;
 }

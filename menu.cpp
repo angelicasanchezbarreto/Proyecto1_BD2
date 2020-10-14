@@ -62,7 +62,16 @@ void Menu::setOperation(){
         cout << "Inserta la cantidad de ventas en la semana 4 "; cin >> temp; data.push_back(temp);
         executeOperation(data);
     } else if(this->operation==4){
-        this->structureSeq.scanAll();
+        cout << "BODEGA "; cout << setw(40);
+        cout << "DISTRITO"; cout << setw(35);
+        cout << "AFORO"; cout << setw(15);
+        cout << "PRODUCTOS"; cout << setw(15);
+        cout << "VENTAS1"; cout << setw(15);
+        cout << "VENTAS2"; cout << setw(15);
+        cout << "VENTAS3"; cout << setw(15);
+        cout << "VENTAS4"; cout << setw(15);
+        cout << endl;
+        this->structureSeq.print();
     }
     cout << endl;
 }
@@ -76,9 +85,8 @@ void Menu::executeOperation(string key){
             rec = this->structureHash.search(key); */
         rec.print();
     
-    }
-    /* else if(this->operation==3)
-        this->structureSeq.delete(key); */
+    } else if(this->operation==3)
+        this->structureSeq.eliminate(key);
         cout << endl;
 }
 

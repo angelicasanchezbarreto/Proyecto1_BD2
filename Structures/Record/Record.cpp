@@ -1,12 +1,19 @@
 #include "Record.hpp"
+#include <iomanip>
 
 void Record::print(){
     string inAux;
     if(this->inAux) inAux = "AUX";
     else inAux = "MAIN";
-    cout << bodega << " " << distrito << " " << aforo << " " << productos << 
-    " " << ventas1 << " " << ventas2 << " " << ventas3 << " " << ventas4 << 
-    " " << pointerTo << " " << inAux ;
+    cout << bodega << " ";
+    cout << distrito << " ";
+    cout << aforo; cout << setw(15); 
+    cout << productos; cout << setw(15);
+    cout << ventas1; cout << setw(15);
+    cout << ventas2; cout << setw(15);
+    cout << ventas3; cout << setw(15);
+    cout << ventas4; cout << setw(15);
+    //cout << " " << pointerTo << " " << inAux ;
 }
 
 Record::Record(vector<string> data){
@@ -17,12 +24,10 @@ Record::Record(vector<string> data){
             strcpy(this->bodega,data[i].c_str()); 
             padding(data[i].length(),this->bodega);
             cont++; break;
-        //case 0: this->bodega = word; cont++; break;
         case 1: 
             strcpy(this->distrito,data[i].c_str()); 
             padding(data[i].length(),this->distrito);
             cont++; break;
-        //case 1: this->distrito = word; cont++; break;
         case 2: this->aforo = stoi(data[i]); cont++; break;
         case 3: this->productos = stoi(data[i]); cont++; break;
         case 4: this->ventas1 = stof(data[i]); cont++; break;
@@ -44,12 +49,10 @@ Record::Record(string record){
             strcpy(this->bodega,word.c_str()); 
             padding(word.length(),this->bodega);
             cont++; break;
-        //case 0: this->bodega = word; cont++; break;
         case 1: 
             strcpy(this->distrito,word.c_str()); 
             padding(word.length(),this->distrito);
             cont++; break;
-        //case 1: this->distrito = word; cont++; break;
         case 2: this->aforo = stoi(word); cont++; break;
         case 3: this->productos = stoi(word); cont++; break;
         case 4: this->ventas1 = stof(word); cont++; break;
@@ -64,7 +67,6 @@ Record::Record(string record){
 void Record::padding(int size, char* variable){
     for(int i=size; i<39; i++)
         variable[i] = ' ';
-    //variable[39]='\0';
 }
 
 
@@ -79,8 +81,6 @@ void Record::setWhichFile(bool isOnAux){
 Record Record::operator=(const Record &other) {
     strcpy(bodega,other.bodega);
     strcpy(distrito,other.distrito);
-    /* this->bodega=other.bodega;
-    this->distrito=other.distrito; */
     this->aforo=other.aforo;
     this->productos=other.productos;
     this->ventas1=other.ventas1;
@@ -111,14 +111,14 @@ bool Record::checkIfKeyEqual(const Record& record2){
     return (s1 == s2);
 }
 
+
 bool Record::compareKey(string key){
-    for(int i=0; i<key.length();){
-        if(key[i]==this->bodega[i])
-            i++;
-        else
-            return false;
-    }
-    return true;
+    char bodega[40];
+    strcpy(bodega,key.c_str()); 
+    padding(key.length(),bodega);
+    string s1(this->bodega);
+    string s2(bodega);
+    return (s1 == s2);
 }
 
 void Record::setNewValues(Record &other, int pointerTo, bool whichFile){
@@ -127,7 +127,7 @@ void Record::setNewValues(Record &other, int pointerTo, bool whichFile){
     this->setWhichFile(whichFile);
 }
 
-void Record::find(ifstream &inFile, ifstream &inAuxFile, string key, pair<int,bool> header){
+void Record::find(fstream &inFile, fstream &inAuxFile, string key, pair<int,bool> header){
     if(!header.second){
         inFile.seekg(header.first*sizeof(Record));
         inFile.read((char *) this, sizeof(Record));
@@ -135,7 +135,6 @@ void Record::find(ifstream &inFile, ifstream &inAuxFile, string key, pair<int,bo
         inAuxFile.seekg(header.first*sizeof(Record));
         inAuxFile.read((char *) this, sizeof(Record));
     }
-    //inFile.read((char *) this, sizeof(Record));
     while (!(this->compareKey(key))) { 
         if(!this->inAux){
             inFile.seekg(this->pointerTo*sizeof(Record));

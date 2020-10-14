@@ -24,7 +24,9 @@ class SequentialFile{
 
         void writeRecord(Record record,string filename);
         
-        void checkOpening(ifstream &mainFile, ifstream &auxFile);
+        void checkOpeningIn(fstream &mainFile, fstream &auxFile);
+
+        void checkOpeningInOut(fstream &mainFile, fstream &auxFile);
 
         int numberOfRecords(string whichFile);
 
@@ -34,6 +36,8 @@ class SequentialFile{
 
         void initData(Record record);
 
+        Record getFirstRecord(fstream& file, fstream &auxfile);
+
     public:
     
         SequentialFile();
@@ -42,7 +46,11 @@ class SequentialFile{
 
         void scanAll();
 
+        void print();
+
         void add(Record record);
+
+        void eliminate(string key);
 
         ~SequentialFile(){
             remove("data.dat");

@@ -8,7 +8,6 @@ struct Menu{
     int operation;
     int structureNum;
     SequentialFile structureSeq;
-    //Hashing hashingFile;
     void displayMenu();
     void executeOperation(string key);
     void executeOperation(vector<string> data);

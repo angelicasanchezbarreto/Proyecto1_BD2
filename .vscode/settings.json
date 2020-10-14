@@ -11,6 +11,7 @@
         "array": "cpp",
         "*.tcc": "cpp",
         "fstream": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "iomanip": "cpp"
     }
 }

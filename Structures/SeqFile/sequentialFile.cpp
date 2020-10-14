@@ -20,11 +20,22 @@ void SequentialFile::writeRecord(Record record,string filename){
     outFile.close();    
 }
         
-void SequentialFile::checkOpening(ifstream &mainFile, ifstream &auxFile){
+void SequentialFile::checkOpeningIn(fstream &mainFile, fstream &auxFile){
     mainFile.open(filename, ios::binary|ios::in);  
     if(!mainFile)
         exit(EXIT_FAILURE);  
     auxFile.open(auxFilename, ios::binary|ios::in); 
+    if(!auxFile)
+        exit(EXIT_FAILURE); 
+}
+
+void SequentialFile::checkOpeningInOut(fstream &mainFile, fstream &auxFile){
+    mainFile.open(filename, ios::binary|ios::out|ios::in);  
+    if(!mainFile)
+        exit(EXIT_FAILURE);  
+    auxFile.open(auxFilename, ios::binary|ios::out|ios::in); 
+    if(!mainFile)
+        exit(EXIT_FAILURE); 
 }
 
 int SequentialFile::numberOfRecords(string whichFile){
@@ -40,22 +51,27 @@ int SequentialFile::numberOfRecords(string whichFile){
     return num;
 }
 
+Record SequentialFile::getFirstRecord(fstream& file, fstream& auxfile){
+    Record record;
+    if(!header.second){
+        file.seekg(header.first*sizeof(Record));
+        file.read((char *) &record, sizeof(Record));
+    } else{
+        auxfile.seekg(header.first*sizeof(Record));
+        auxfile.read((char *) &record, sizeof(Record));
+    }
+    return record;
+}
+
 void SequentialFile::update(Record record){
     int cont = this->numOfRecords;
     fstream file;
     fstream auxfile;
-    file.open(filename,ios::ate|ios::in|ios::out|ios::binary);
-    auxfile.open(auxFilename,ios::ate|ios::in|ios::out|ios::binary);
+    checkOpeningInOut(file,auxfile);
 
-    Record nextRecord;   
     Record prevRecord; 
-    if(!header.second){
-        file.seekg(header.first*sizeof(Record));
-        file.read((char *) &nextRecord, sizeof(Record));
-    } else{
-        auxfile.seekg(header.first*sizeof(Record));
-        auxfile.read((char *) &nextRecord, sizeof(Record));
-    }
+    Record nextRecord = getFirstRecord(file,auxfile);  
+
     prevRecord = nextRecord;
     bool changed=false;
     while (changed==false) {
@@ -86,28 +102,23 @@ void SequentialFile::update(Record record){
 
 void SequentialFile::reconstruction(){
     int cont = this->numOfRecords;
-    ifstream inFile;
-    ifstream inAuxFile;        
-    checkOpening(inFile,inAuxFile);
+    fstream inFile;
+    fstream inAuxFile;        
+    checkOpeningIn(inFile,inAuxFile);
+
     fstream newFile;
     newFile.open("newFile.dat",ios::binary|ios::out|ios::app);
-    Record record;
+    Record record = getFirstRecord(inFile,inAuxFile);
     Record toInsert;
     int pos=1;
-
-    if(!header.second){
-        inFile.seekg(header.first*sizeof(Record));
-        inFile.read((char *) &record, sizeof(Record));
-    } else{
-        inAuxFile.seekg(header.first*sizeof(Record));
-        inAuxFile.read((char *) &record, sizeof(Record));
-    }
 
     this->header={0,false};
     toInsert.setNewValues(record,pos,false);
     newFile.write((char *) &toInsert, sizeof(record)); 
     while(cont--){
         pos++;
+        if(cont==0)
+            pos=-1;
         if(!record.inAux){
             inFile.seekg(record.pointerTo*sizeof(Record));
             inFile.read((char *) &record, sizeof(record)); 
@@ -159,9 +170,9 @@ SequentialFile::SequentialFile(){
 }
 
 Record SequentialFile::search(string key){
-    ifstream inFile;
-    ifstream inAuxFile;        
-    checkOpening(inFile,inAuxFile);
+    fstream inFile;
+    fstream inAuxFile;        
+    checkOpeningIn(inFile,inAuxFile);
     Record record;   
     record.find(inFile,inAuxFile,key,this->header); 
     inFile.close();  
@@ -170,15 +181,14 @@ Record SequentialFile::search(string key){
 }
 
 void SequentialFile::scanAll(){
-    ifstream inFile;
-    ifstream inAuxFile;
-    checkOpening(inFile,inAuxFile);
+    fstream inFile;
+    fstream inAuxFile;
+    checkOpeningIn(inFile,inAuxFile);
 
     Record record;
     if(numberOfRecords(filename)>0){
         cout << "IN MAIN FILE:" << endl;
         while(inFile.read((char*) &record, sizeof(Record))){
-            //inFile.seekg()
             cout << setw(10);
             record.print();
             cout << endl;
@@ -196,14 +206,30 @@ void SequentialFile::scanAll(){
     inAuxFile.close();
 }
 
+void SequentialFile::print(){
+    Record temp;
+    fstream inFile;
+    fstream inAuxFile;
+    checkOpeningIn(inFile,inAuxFile);
+    temp = getFirstRecord(inFile, inAuxFile);
+    while (temp.pointerTo!=-1){
+        temp.print(); cout << endl;
+        if(!temp.inAux){
+            inFile.seekg(temp.pointerTo*sizeof(Record));
+            inFile.read((char *) &temp, sizeof(Record));    
+        } else {
+            inAuxFile.seekg(temp.pointerTo*sizeof(Record));
+            inAuxFile.read((char *) &temp, sizeof(Record));
+        }
+    }
+
+}
+
 void SequentialFile::add(Record record){
     int cont = this->numOfRecords;
     fstream inFile;
     fstream inAuxFile;
-    inFile.open(filename, ios::binary|ios::in|ios::out);  
-    if(!inFile)
-        exit(EXIT_FAILURE);  
-    inAuxFile.open(auxFilename, ios::binary|ios::in|ios::out);  
+    checkOpeningInOut(inFile,inAuxFile); 
 
     if(numberOfRecords(filename)==0){
         record.setPointer(-1);
@@ -211,15 +237,8 @@ void SequentialFile::add(Record record){
         this->header = make_pair(0,false);
     }
     else if(numberOfRecords(auxFilename)<5){
-        Record nextRecord;   
-        Record prevRecord; 
-        if(!header.second){
-            inFile.seekg(header.first*sizeof(Record));
-            inFile.read((char *) &nextRecord, sizeof(Record));
-        } else{
-            inAuxFile.seekg(header.first*sizeof(Record));
-            inAuxFile.read((char *) &nextRecord, sizeof(Record));
-        }
+        Record prevRecord;
+        Record nextRecord = getFirstRecord(inFile,inAuxFile); 
 
         prevRecord = nextRecord;
         while (cont--) {
@@ -232,7 +251,7 @@ void SequentialFile::add(Record record){
                     inFile.read((char *) &nextRecord, sizeof(Record));    
                 } else {
                     inAuxFile.seekg(nextRecord.pointerTo*sizeof(Record));
-                    inAuxFile.read((char *) &nextRecord, sizeof(nextRecord));
+                    inAuxFile.read((char *) &nextRecord, sizeof(Record));
                 }
             }
             else break;
@@ -274,3 +293,77 @@ void SequentialFile::add(Record record){
     inFile.close();
     inAuxFile.close();
 }
+
+void SequentialFile::eliminate(string key){
+    bool found=false;
+    int cont = this->numOfRecords;
+    fstream inFile;
+    fstream inAuxFile;
+    inFile.open(filename,ios::ate|ios::in|ios::out|ios::binary);
+    inAuxFile.open(auxFilename,ios::ate|ios::in|ios::out|ios::binary);
+
+    fstream newFileMain;
+    fstream newFileAux;
+    newFileMain.open("newMainFile.dat",ios::binary|ios::out|ios::app);
+    newFileAux.open("newAuxFile.dat",ios::binary|ios::out|ios::app);
+
+    Record prevRecord; 
+    Record nextRecord = getFirstRecord(inFile,inAuxFile);  
+    prevRecord = nextRecord;
+    while (found==false) {
+        if(!nextRecord.checkIfKeyEqual(key)) {
+
+            if(prevRecord.pointerTo==this->header.first && prevRecord.inAux==this->header.second){
+                if(this->header.second==false)
+                    newFileMain.write((char*) &nextRecord, sizeof(Record));
+                else 
+                    newFileAux.write((char*) &nextRecord, sizeof(Record));
+            } else {
+                if(prevRecord.inAux==false)
+                    newFileMain.write((char*) &nextRecord, sizeof(Record));
+                else
+                    newFileAux.write((char*) &nextRecord, sizeof(Record));
+            }
+            prevRecord = nextRecord;
+
+            if(nextRecord.pointerTo==-1)
+                break;
+            if(!nextRecord.inAux){
+                inFile.seekg(nextRecord.pointerTo*sizeof(Record));
+                inFile.read((char *) &nextRecord, sizeof(Record)); 
+            } else {
+                inAuxFile.seekg(nextRecord.pointerTo*sizeof(Record));
+                inAuxFile.read((char *) &nextRecord, sizeof(nextRecord));
+            }
+        }
+        else found=true;
+    }
+    Record tempRecord;
+    while (nextRecord.pointerTo!=-1) {
+        if(nextRecord.pointerTo==-1)
+            break;
+        if(!nextRecord.inAux){
+            tempRecord.setNewValues(nextRecord,nextRecord.pointerTo-1,nextRecord.inAux);
+            newFileMain.write((char*) &tempRecord, sizeof(Record));
+            inFile.seekg(nextRecord.pointerTo*sizeof(Record));
+            inFile.read((char *) &nextRecord, sizeof(Record)); 
+        } else {
+            tempRecord.setNewValues(nextRecord,nextRecord.pointerTo-1,nextRecord.inAux);
+            newFileAux.write((char*) &tempRecord, sizeof(Record));
+            inAuxFile.seekg(nextRecord.pointerTo*sizeof(Record));
+            inAuxFile.read((char *) &nextRecord, sizeof(nextRecord));
+        }
+    }
+
+    if(prevRecord==nextRecord){
+        this->header=make_pair(nextRecord.pointerTo,nextRecord.inAux);
+    }
+
+    /* inFile.clear();
+    inAuxFile.clear(); */
+    remove("data.dat");
+    remove("aux.dat");
+    rename("newMainFile.dat","data.dat");
+    rename("newAuxFile.dat","aux.dat");
+}
+

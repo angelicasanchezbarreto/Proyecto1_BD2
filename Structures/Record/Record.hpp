@@ -28,13 +28,15 @@ class Record{
 
         Record(string record);
 
+        Record operator=(const Record &other);
+
+    protected:
+
         void padding(int size, char* variable);
 
         void setPointer(int num);
 
         void setWhichFile(bool isOnAux);
-
-        Record operator=(const Record &other);
 
         bool operator==(const Record &other);
 
@@ -44,5 +46,7 @@ class Record{
 
         void setNewValues(Record &other, int pointerTo, bool whichFile);
 
-        void find(ifstream &inFile, ifstream &inAuxFile, string key, pair<int,bool> header);
+        void find(fstream &inFile, fstream &inAuxFile, string key, pair<int,bool> header);
+
+        friend class SequentialFile;
 };
